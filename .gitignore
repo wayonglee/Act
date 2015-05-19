@@ -1,0 +1,65 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.tlog
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+*.bak
+*.[o]
+*~
+*.swp
+*.swo
+*.bak
+out/
+v8.log
+R.java
+*.img
+*.log
+default.properties
+bin/
+gen/
+*.tmp
+*.db
+*.classpath
+packages/apps/*/.classpath
+packages/apps/Settings/tests/.classpath
+packages/apps/Launcher2/lint.xml
+&1
+.svn/
+.goutputstream*
+project.properties
+.project
+
+cocos2d
+proj.android
+proj.ios_mac
+proj.linux
+proj.win8.1-universal
+proj.win32
+proj.wp8-xaml
+.cocos-project.json
+CMakeLists.txt
