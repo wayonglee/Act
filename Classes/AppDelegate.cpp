@@ -40,7 +40,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 
 	glview->setFrameSize(480,320);
-	//glview->setFrameSize(1920,1080);
+	glview->setFrameSize(1920,1080);
 	glview->setDesignResolutionSize(480,320,ResolutionPolicy::FIXED_WIDTH);
     // turn on display FPS
     director->setDisplayStats(false);
@@ -52,10 +52,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // create a scene. it's an autorelease object
     auto scene = GameScene::create();
-	auto test = scene;
 
     // run
     director->runWithScene(scene);
+
+	scene->connect();
 
     return true;
 }

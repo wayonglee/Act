@@ -17,5 +17,7 @@ bool StateLayer::init()
 	{
 		return false;
 	}
+	lifeShow = LifeShow::create();
+	this->addChild(lifeShow,1,1);
 	return true;
 }

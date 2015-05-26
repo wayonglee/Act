@@ -1,4 +1,6 @@
 #include "Hero.h"
+#include "Enemy.h"
+#include "GameLayer.h"
 
 Hero::Hero(void)
 {
@@ -21,7 +23,8 @@ bool Hero::init()
 	addAnimate();
 
 	this->setSpeed(3);
-	this->setAttackRange(Vec2(50,20));
+	this->setAttackRange(Vec2(80,25));
+	this->setAttackDamage(50.0f);
 
 	this->runStayAction();
 	//this->runHurtAction();
@@ -46,11 +49,14 @@ void Hero::addAnimate()
 
 	Animation* hurtAnimation = this->createAnimation("boy_hurt_%02d.png",2,5);//创建受伤动画
 	this->setHurtAction(RepeatForever::create(Animate::create(hurtAnimation)));
+
+	Animation* deadAnimation = this->createAnimation("boy_dead_%02d.png",3,10);//创建死亡动画
+	this->setDeadAction(Animate::create(deadAnimation));
 }
 
 void Hero::updateSelf(float)
 {
-
+	if(curtLifeValue<=0)changeState(DEAD);
 	if(curState == WALK)
 	{
 		float mapx = myMap->getPosition().x;
@@ -64,18 +70,34 @@ void Hero::updateSelf(float)
 		{
 			direction.y = 0;
 		}
-		if(dest.x - mapx >=255 && mapWidth-dest.x >=255)
+		if(dest.x - mapx >=240+20 && mapWidth-dest.x >=240+20)
 		{
 			moveMap(direction.x); 
 			direction.x = 0;
 		}
 		move(direction,isFlipped);
 	}
-	if(curState == ATTACK)
+	if(curState==ATTACK)
 	{
-		if(abs(myEnemy->getPosition().x-this->getPosition().x)<attackRange.x)
-			if(abs(myEnemy->getPosition().y-this->getPosition().y)<attackRange.y)
-				myEnemy->changeState(HURT,0.4f);
+		Ref* it;
+		Enemy* myEnemy;
+		CCARRAY_FOREACH(myEnemies, it)//遍历敌人
+		{
+			myEnemy = (Enemy*)it;
+			Vec2 distance = myEnemy->getPosition()-this->getPosition();
+			if(!isFlipped)
+			{
+				if(distance.x<this->getAttackRange().x&&distance.x>-10&&abs(distance.y)<this->getAttackRange().y)
+					//判断敌人是否在攻击范围内
+					myEnemy->changeState(HURT,0.5f,0.0f,attackDamage);
+			}
+			else
+			{
+				if(distance.x>-this->getAttackRange().x&&distance.x<10&&abs(distance.y)<this->getAttackRange().y)
+					//判断敌人是否在攻击范围内
+					myEnemy->changeState(HURT,0.5f,0.0f,attackDamage);
+			}
+		}
 	}
 }
 
@@ -89,15 +111,21 @@ void Hero::moveMap(float dx)
 			Vec2 destdir = Vec2(realx,0);
 			auto moveby = MoveBy::create(1/60,destdir);
 			myMap->runAction(moveby);
-			myEnemy->runAction(moveby->clone());
+			Ref* it;
+			Enemy* myEnemy;
+			CCARRAY_FOREACH(myEnemies, it)
+			{
+				myEnemy = (Enemy*)it;
+				myEnemy->runAction(moveby->clone());
+			}
 		}
 	}
 }
 
 void Hero::connect()
 {
-	myMap = (TMXTiledMap*)Director::getInstance()->getRunningScene()->getChildByTag(0)->getChildByTag(1)->getChildByTag(1);
+	myMap = (TMXTiledMap*)this->getParent()->getParent()->getChildByTag(0)->getChildByTag(1)->getChildByTag(1);
 	floor = myMap->getLayer("Floor");
-	myEnemy = (Enemy*)Director::getInstance()->getRunningScene()->getChildByTag(0)->getChildByTag(20);
-	myEnemy->connect();
+	auto gamelayer = (GameLayer*)this->getParent()->getParent()->getChildByTag(0);
+	myEnemies = gamelayer->getEnemies();
 }

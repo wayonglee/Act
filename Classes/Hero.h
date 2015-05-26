@@ -2,14 +2,13 @@
 #define _HERO_H_
 #include"cocos2d.h"
 #include"Role.h"
-#include"Enemy.h"
 
 class Hero:public Role
 {
 private:
 	TMXTiledMap* myMap;
 	TMXLayer* floor;
-	Enemy* myEnemy;
+	CCArray* myEnemies;
 public:
 	Hero(void);
 	~Hero(void);

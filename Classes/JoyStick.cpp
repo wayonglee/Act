@@ -52,11 +52,6 @@ void JoyStick::addEventListener()
 
 void JoyStick::onTouchesBegan(const std::vector<Touch*>& touches,Event* pEvent)
 {
-	if(first)
-	{
-		connect();//按钮绑定英雄,地图
-		first = false;
-	}
 	auto touchPoint = touches[0]->getLocation();
 	if(touchPoint.distance(stickPosition)<=40)//在按
 	{	
@@ -120,10 +115,10 @@ Vec2 JoyStick::calculateJoyStickLocation(Vec2 touchPoint)
 
 void JoyStick::connect()
 {
-	myHero = (Hero*)Director::getInstance()->getRunningScene()->getChildByTag(0)->getChildByTag(10);
-	myMap = (TMXTiledMap*)Director::getInstance()->getRunningScene()->getChildByTag(0)->getChildByTag(1)->getChildByTag(1);
+	myHero = (Hero*)this->getParent()->getParent()->getChildByTag(0)->getChildByTag(10);
+	myMap = (TMXTiledMap*)this->getParent()->getParent()->getChildByTag(0)->getChildByTag(1)->getChildByTag(1);
 	floor = myMap->getLayer("Floor");
-	myHero->connect();
+	//myHero->connect();
 }
 
 void JoyStick::showJoyStick()

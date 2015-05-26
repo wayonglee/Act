@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Hero.h"
+#include "GameLayer.h"
 
 
 
@@ -22,7 +23,7 @@ bool Enemy::init()
 	this->setAnchorPoint(Vec2(0.5,0.5));
 
 	setSightRange(Vec2(200,100));
-	setAttackRange(Vec2(50,20));
+	setAttackRange(Vec2(50,15));
 	attackCD=0;
 
 
@@ -46,20 +47,27 @@ void Enemy::addAnimate()
 
 	Animation* hurtAnimation = this->createAnimation("bear_hurt_%02d.png",2,5);//创建受伤动画
 	this->setHurtAction(RepeatForever::create(Animate::create(hurtAnimation)));
+
+	Animation* deadAnimation = this->createAnimation("bear_dead_%02d.png",2,5);//创建死亡动画
+	this->setDeadAction(RepeatForever::create(Animate::create(deadAnimation)));
 }
 
 void Enemy::updateSelf(float)
 {
+	if(curtLifeValue<=0)
+	{
+		changeState(DEAD);
+		this->scheduleOnce(schedule_selector(Enemy::deleteSelf),1);
+	}
 	attackCD--;
 	Vec2 distance = myHero->getPosition()-this->getPosition();
 	float x = abs(distance.x);
 	float y = abs(distance.y);
 	if (x<attackRange.x&&y<attackRange.y&&attackCD<=0)
 	{
-		changeState(PREATTACK,0.8f,0.4f);
-		attackCD=120;
+		changeState(PREATTACK,0.8f,0.5f);
 	}
-	else if(x<sightRange.x&&y<sightRange.y&&x>10)
+	else if(x<sightRange.x&&y<sightRange.y&&x>1)
 	{
 		changeState(WALK);
 		getChaseDirection();
@@ -69,17 +77,33 @@ void Enemy::updateSelf(float)
 	{
 		move(direction,isFlipped);
 	}
-	if(curState==ATTACK&&x<attackRange.x&&y<attackRange.y)
+	if(curState==ATTACK)
 	{
-		myHero->changeState(HURT,0.4f);
+		if(!isFlipped)
+		{
+			if(distance.x<attackRange.x&&distance.x>0&&y<attackRange.y)//判断英雄是否在范围内
+			{
+				myHero->changeState(HURT,0.3f,0.0f,attackDamage);
+			}
+		}
+		else
+		{
+			if(distance.x>-attackRange.x&&distance.x<0&&y<attackRange.y)//判断英雄是否在范围内
+			{	
+				myHero->changeState(HURT,0.3f,0.0f,attackDamage);
+			}
+		}
+		attackCD=100;
 	}
 	this->setLocalZOrder(400+myHero->getPosition().y-this->getPosition().y);
 }
 
 void Enemy::connect()
 {
-	myHero = (Hero*)Director::getInstance()->getRunningScene()->getChildByTag(0)->getChildByTag(10);
+	myHero = (Hero*)this->getParent()->getParent()->getChildByTag(0)->getChildByTag(10);
 	this->schedule(schedule_selector(Enemy::updateSelf));
+	auto gamelayer = (GameLayer*)this->getParent()->getParent()->getChildByTag(0);
+	myEnemies = gamelayer->getEnemies();
 }
 
 void Enemy::getChaseDirection()
@@ -94,4 +118,11 @@ void Enemy::getChaseDirection()
 	if(x<0)isFlipped = true;
 	this->setDirection(direction);
 	this->setIsFlipped(isFlipped);
+}
+
+void Enemy::deleteSelf(float)
+{
+	auto gamelayer = (GameLayer*)this->getParent()->getParent()->getChildByTag(0);
+	gamelayer->removeChild(this);
+	myEnemies->removeObject(this);
 }

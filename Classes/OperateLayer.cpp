@@ -1,6 +1,5 @@
 #include "OperateLayer.h"
 #include "Hero.h"
-#include"JoyStick.h"
 
 USING_NS_CC;
 
@@ -36,12 +35,16 @@ void OperateLayer::addAttckMenu()
 	attackItem->setScale(1.5);
 	attackItem->setPosition(visibleSize.width - attackItem->getContentSize().width/2-50, attackItem->getContentSize().height/2+20);
 	auto menu = Menu::create(attackItem,NULL);
-	menu->setPosition(Vec2::ZERO);
+	menu->setPosition(Vec2(0,0));
 	this->addChild(menu,100);
 }
 
 void OperateLayer::attackButton(Ref* pSender)
 {
-	if(first)myHero = (Hero*)Director::getInstance()->getRunningScene()->getChildByTag(0)->getChildByTag(10);
-	myHero->changeState(PREATTACK,0.8f,0.4f);
+	myHero->changeState(PREATTACK,0.8f,0.3f);
+}
+
+void OperateLayer::connect()
+{
+	myHero = (Hero*)this->getParent()->getChildByTag(0)->getChildByTag(10);
 }

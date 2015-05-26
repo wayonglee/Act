@@ -5,12 +5,16 @@ Role::Role(void):
 	walkAction(NULL),
 	attackAction(NULL),
 	hurtAction(NULL),
+	deadAction(NULL),
 	curState(STAY),
 	stateChangeable(true),
 	stateBreakable(true),
 	direction(Vec2(0,0)),
 	isFlipped(false),
-	speed(1)
+	speed(1),
+	curtLifeValue(100.0f),
+	sumLifeValue(100.0f),
+	attackDamage(5.0f)
 {
 	
 }
@@ -22,6 +26,7 @@ Role::~Role(void)
 	CC_SAFE_RELEASE_NULL(walkAction);
 	CC_SAFE_RELEASE_NULL(attackAction);
 	CC_SAFE_RELEASE_NULL(hurtAction);
+	CC_SAFE_RELEASE_NULL(deadAction);
 }
 
 void Role::runStayAction()
@@ -42,6 +47,11 @@ void Role::runAttackAction()
 void Role::runHurtAction()
 {
 	this->runAction(hurtAction);
+}
+
+void Role::runDeadAction()
+{
+	this->runAction(deadAction);
 }
 
 Animation* Role::createAnimation(const char* formatStr,int frameSize,int fps)
@@ -72,31 +82,24 @@ void Role::move(Vec2 dir , bool isFlipped)
 {
 	if(curState==WALK)
 	{
-		this->setFlipX(isFlipped);
+		this->setFlippedX(isFlipped);
 		Vec2 destdir = Vec2(dir.x*speed,dir.y*speed);
 		this->runAction(MoveBy::create(1/60,destdir));
 	}
 }
 
-bool Role::changeState(RoleState state,float delay,float roll)
+bool Role::changeState(RoleState state,float delay,float roll,float damage)
 {
-	if(stateChangeable&&curState!=state)
+	if( (stateChangeable&&curState!=state) || (state==HURT&&stateBreakable))
 	{
-		//stopAllActions();
-		switch(curState)
-		{
-			case STAY:this->stopAction( stayAction );break;
-			case WALK:this->stopAction( walkAction );break;
-			case PREATTACK:this->stopAction( attackAction );break;
-			case ATTACK:this->stopAction( attackAction );break;
-			case HURT:this->stopAction( hurtAction );break;
-		}
+		stopAllActions();
 		switch(state)
 		{
 			case STAY:this->runStayAction();break;
 			case WALK:this->runWalkAction();direction = Vec2(0,0);break;
 			case PREATTACK:this->attack(roll,delay);stateChangeable = false;break;
-			case HURT:this->hurt(delay);stateChangeable = false;break;
+			case HURT:this->hurt(delay);stateChangeable = false;stateBreakable = false; lostLife(damage);break;
+			case DEAD:this->runDeadAction();stateChangeable = false; stateBreakable = false; break;
 		}
 	curState = state;
 	return true;
@@ -113,13 +116,17 @@ void Role::attack(float roll,float delay)
 
 void Role::attackBegin(float)
 {
-	this->setCurState(ATTACK);
+	if(curState==PREATTACK)
+		this->setCurState(ATTACK);
 }
 
 void Role::attackFinish(float)
 {
-	stateChangeable = true;
-	changeState(STAY);
+	if(curState==ATTACK)
+	{
+		stateChangeable = true;
+		changeState(STAY);
+	}
 }
 
 void Role::hurt(float delay)
@@ -130,6 +137,15 @@ void Role::hurt(float delay)
 
 void Role::hurtFinish(float)
 {
-	stateChangeable = true;
-	changeState(STAY);
+	if(curState==HURT)
+	{
+		stateChangeable = true;
+		stateBreakable = true;
+		changeState(STAY);
+	}
+}
+
+void Role::lostLife(float damage)
+{
+	curtLifeValue -= damage;
 }

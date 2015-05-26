@@ -9,6 +9,7 @@ public:
 	~GameScene(void);
 	CREATE_FUNC(GameScene);
 	virtual bool init();
+	void connect();
 };
 
 #endif

@@ -17,6 +17,7 @@ class Enemy:public Role
 private:
 	Hero* myHero;
 	int attackCD;
+	CCArray* myEnemies;
 public:
 	CC_SYNTHESIZE(EnemyState,enemyCurState,EnemyCurState);
 	CC_SYNTHESIZE(Vec2,sightRange,SightRange);
@@ -30,6 +31,7 @@ public:
 	void connect();
 	//void changeEnemyState(EnemyState);
 	void getChaseDirection();
+	void deleteSelf(float);
 };
 
 #endif
