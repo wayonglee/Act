@@ -14,10 +14,10 @@ public:
 	~Hero(void);
 	CREATE_FUNC(Hero);
 	CC_SYNTHESIZE(Vec2,attackRange,AttackRange);
+	CC_SYNTHESIZE(int,attackCD,AttackCD);
 	virtual bool init();
 	void addAnimate();
 	void updateSelf(float);
-	void moveMap(float);
 	void connect();
 };
 

@@ -1,4 +1,8 @@
 #include "Role.h"
+#include "DamageShow.h"
+#include<sstream>
+
+using namespace std;
 
 Role::Role(void):
 	stayAction(NULL),
@@ -90,21 +94,25 @@ void Role::move(Vec2 dir , bool isFlipped)
 
 bool Role::changeState(RoleState state,float delay,float roll,float damage)
 {
-	if( (stateChangeable&&curState!=state) || (state==HURT&&stateBreakable))
+	if(curState!=DEAD)
 	{
-		stopAllActions();
-		switch(state)
+		if( (stateChangeable&&curState!=state) || (state==HURT&&stateBreakable))
 		{
-			case STAY:this->runStayAction();break;
-			case WALK:this->runWalkAction();direction = Vec2(0,0);break;
-			case PREATTACK:this->attack(roll,delay);stateChangeable = false;break;
-			case HURT:this->hurt(delay);stateChangeable = false;stateBreakable = false; lostLife(damage);break;
-			case DEAD:this->runDeadAction();stateChangeable = false; stateBreakable = false; break;
+			stopAllActions();
+			//this->unscheduleAllSelectors();
+			switch(state)
+			{
+				case STAY: stateChangeable = true; stateBreakable = true; this->runStayAction(); break;
+				case WALK: stateChangeable = true; stateBreakable = true; this->runWalkAction(); direction = Vec2(0,0); break;
+				case PREATTACK: stateChangeable = false; stateBreakable = true; this->attack(roll,delay); break;
+				case HURT: stateChangeable = false; stateBreakable = false; this->hurt(delay); lostLife(damage);break;
+				case DEAD: stateChangeable = false; stateBreakable = false; this->runDeadAction(); break;
+			}
+			curState = state;
+			return true;
 		}
-	curState = state;
-	return true;
 	}
-	else return false;
+	return false;
 }
 
 void Role::attack(float roll,float delay)
@@ -117,16 +125,16 @@ void Role::attack(float roll,float delay)
 void Role::attackBegin(float)
 {
 	if(curState==PREATTACK)
+	{
+		stateBreakable = false;
 		this->setCurState(ATTACK);
+	}
 }
 
 void Role::attackFinish(float)
 {
-	if(curState==ATTACK)
-	{
-		stateChangeable = true;
-		changeState(STAY);
-	}
+	stateChangeable = true;
+	changeState(STAY);
 }
 
 void Role::hurt(float delay)
@@ -148,4 +156,15 @@ void Role::hurtFinish(float)
 void Role::lostLife(float damage)
 {
 	curtLifeValue -= damage;
+	string damageString;
+	ostringstream oss;
+	oss<<damage;
+	damageString = oss.str();
+	LabelTTF* damageShow = LabelTTF::create(damageString, "Arial", 18);
+	damageShow->setColor(Color3B::RED);
+	damageShow->setPosition(this->getPosition().x,this->getPosition().y+70);
+	this->getParent()->addChild(damageShow,1000);
+	damageShow->runAction(MoveBy::create(0.5f,Vec2(0,30)));
+	damageShow->scheduleOnce(schedule_selector(DamageShow::removeSelf),0.7f);
 }
+

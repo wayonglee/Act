@@ -41,7 +41,10 @@ void OperateLayer::addAttckMenu()
 
 void OperateLayer::attackButton(Ref* pSender)
 {
-	myHero->changeState(PREATTACK,0.8f,0.3f);
+	if(myHero->getAttackCD()<=0)
+	{
+		myHero->changeState(PREATTACK,0.8f,0.3f);
+	}
 }
 
 void OperateLayer::connect()

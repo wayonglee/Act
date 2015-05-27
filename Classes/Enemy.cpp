@@ -26,6 +26,7 @@ bool Enemy::init()
 	setAttackRange(Vec2(50,15));
 	attackCD=0;
 
+	setAttackDamage(1.0f);
 
 	addAnimate();
 
@@ -79,21 +80,24 @@ void Enemy::updateSelf(float)
 	}
 	if(curState==ATTACK)
 	{
-		if(!isFlipped)
+		if(attackCD<=0)
 		{
-			if(distance.x<attackRange.x&&distance.x>0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
+			if(!isFlipped)
 			{
-				myHero->changeState(HURT,0.3f,0.0f,attackDamage);
+				if(distance.x<attackRange.x&&distance.x>0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
+				{
+					myHero->changeState(HURT,0.05f,0.0f,attackDamage);
+				}
+			}
+			else
+			{
+				if(distance.x>-attackRange.x&&distance.x<0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
+				{
+					myHero->changeState(HURT,0.05f,0.0f,attackDamage);
+				}
 			}
 		}
-		else
-		{
-			if(distance.x>-attackRange.x&&distance.x<0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
-			{	
-				myHero->changeState(HURT,0.3f,0.0f,attackDamage);
-			}
-		}
-		attackCD=100;
+		attackCD=20;
 	}
 	this->setLocalZOrder(400+myHero->getPosition().y-this->getPosition().y);
 }
@@ -122,7 +126,9 @@ void Enemy::getChaseDirection()
 
 void Enemy::deleteSelf(float)
 {
+
 	auto gamelayer = (GameLayer*)this->getParent()->getParent()->getChildByTag(0);
 	gamelayer->removeChild(this);
 	myEnemies->removeObject(this);
+	this->release();
 }

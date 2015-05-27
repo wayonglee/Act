@@ -22,7 +22,7 @@ bool Hero::init()
 
 	addAnimate();
 
-	this->setSpeed(3);
+	this->setSpeed(5);
 	this->setAttackRange(Vec2(80,25));
 	this->setAttackDamage(50.0f);
 
@@ -30,6 +30,8 @@ bool Hero::init()
 	//this->runHurtAction();
 	this->schedule(schedule_selector(Hero::updateSelf));
 	return true;
+
+	attackCD=0;
 }
 
 void Hero::addAnimate()
@@ -56,13 +58,14 @@ void Hero::addAnimate()
 
 void Hero::updateSelf(float)
 {
+	attackCD--;
 	if(curtLifeValue<=0)changeState(DEAD);
 	if(curState == WALK)
 	{
 		float mapx = myMap->getPosition().x;
 		float mapWidth = myMap->getBoundingBox().getMaxX();
 		Vec2 dest = getPosition() + direction * getSpeed();
-		if(dest.x < 0 || dest.x > 480)
+		if(dest.x < 0 ||dest.x >myMap->getMapSize().width * myMap->getTileSize().width)
 		{
 			direction.x = 0;
 		}
@@ -70,55 +73,42 @@ void Hero::updateSelf(float)
 		{
 			direction.y = 0;
 		}
-		if(dest.x - mapx >=240+20 && mapWidth-dest.x >=240+20)
-		{
-			moveMap(direction.x); 
-			direction.x = 0;
-		}
 		move(direction,isFlipped);
+		auto winSize = Director::getInstance()->getWinSize();
+		int x = MAX(this->getPosition().x, winSize.width/2);
+		int y = MAX(this->getPosition().y, winSize.height/2);
+		x = MIN(x, (myMap->getMapSize().width * myMap->getTileSize().width) - winSize.width/2);
+		y = MIN(y, (myMap->getMapSize().height * myMap->getTileSize().height) - winSize.height/2);
+		Point actualPosition = Vec2(x, y);
+		Point centerOfView = Vec2(winSize.width/2, winSize.height/2);
+		Point viewPoint = centerOfView - actualPosition;
+		this->getParent()->setPosition(viewPoint);
 	}
 	if(curState==ATTACK)
 	{
-		Ref* it;
-		Enemy* myEnemy;
-		CCARRAY_FOREACH(myEnemies, it)//±È¿˙µ–»À
+		if(attackCD<=0)
 		{
-			myEnemy = (Enemy*)it;
-			Vec2 distance = myEnemy->getPosition()-this->getPosition();
-			if(!isFlipped)
-			{
-				if(distance.x<this->getAttackRange().x&&distance.x>-10&&abs(distance.y)<this->getAttackRange().y)
-					//≈–∂œµ–»À «∑Ò‘⁄π•ª˜∑∂Œßƒ⁄
-					myEnemy->changeState(HURT,0.5f,0.0f,attackDamage);
-			}
-			else
-			{
-				if(distance.x>-this->getAttackRange().x&&distance.x<10&&abs(distance.y)<this->getAttackRange().y)
-					//≈–∂œµ–»À «∑Ò‘⁄π•ª˜∑∂Œßƒ⁄
-					myEnemy->changeState(HURT,0.5f,0.0f,attackDamage);
-			}
-		}
-	}
-}
-
-void Hero::moveMap(float dx)
-{
-	if(curState == WALK)
-	{
-		float realx = -dx*speed;
-		if(myMap->getPosition().x + realx <= -5 && myMap->getBoundingBox().getMaxX() + realx >= 485)
-		{
-			Vec2 destdir = Vec2(realx,0);
-			auto moveby = MoveBy::create(1/60,destdir);
-			myMap->runAction(moveby);
 			Ref* it;
 			Enemy* myEnemy;
-			CCARRAY_FOREACH(myEnemies, it)
+			CCARRAY_FOREACH(myEnemies, it)//±È¿˙µ–»À
 			{
 				myEnemy = (Enemy*)it;
-				myEnemy->runAction(moveby->clone());
+				Vec2 distance = myEnemy->getPosition()-this->getPosition();
+				if(!isFlipped)
+				{
+					if(distance.x<this->getAttackRange().x&&distance.x>-10&&abs(distance.y)<this->getAttackRange().y)
+						//≈–∂œµ–»À «∑Ò‘⁄π•ª˜∑∂Œßƒ⁄
+						myEnemy->changeState(HURT,0.3f,0.0f,attackDamage);
+				}
+				else
+				{
+					if(distance.x>-this->getAttackRange().x&&distance.x<10&&abs(distance.y)<this->getAttackRange().y)
+						//≈–∂œµ–»À «∑Ò‘⁄π•ª˜∑∂Œßƒ⁄
+						myEnemy->changeState(HURT,0.3f,0.0f,attackDamage);
+				}
 			}
 		}
+		attackCD=10;
 	}
 }
 

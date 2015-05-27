@@ -18,7 +18,7 @@ bool MapLayer::init()
 		return false;
 	}
 	TMXTiledMap *map = TMXTiledMap::create("res/mymap.tmx");
-	map->setPosition(Vec2(-5,0));
+	map->setPosition(Vec2(0,0));
 	this->addChild(map,0,1);
 	return true;
 }

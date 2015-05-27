@@ -12,6 +12,8 @@ private:
 	Hero* hero;
 	CCArray* enemies;
 	int enemyNumber;
+	LabelTTF* enemyKilled;
+	int enemyKilledNumber;
 public:
 	GameLayer(void);
 	~GameLayer(void);
