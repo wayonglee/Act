@@ -22,7 +22,7 @@ bool Hero::init()
 
 	addAnimate();
 
-	this->setSpeed(5);
+	this->setSpeed(3);
 	this->setAttackRange(Vec2(80,25));
 	this->setAttackDamage(50.0f);
 
@@ -58,7 +58,7 @@ void Hero::addAnimate()
 
 void Hero::updateSelf(float)
 {
-	attackCD--;
+	if(attackCD>0)attackCD--;
 	if(curtLifeValue<=0)changeState(DEAD);
 	if(curState == WALK)
 	{
@@ -83,6 +83,10 @@ void Hero::updateSelf(float)
 		Point centerOfView = Vec2(winSize.width/2, winSize.height/2);
 		Point viewPoint = centerOfView - actualPosition;
 		this->getParent()->setPosition(viewPoint);
+		this->getParent()->getChildByTag(2)->setPosition(x,Director::getInstance()->getVisibleSize().height-20);
+		this->getParent()->getChildByTag(3)->setPosition(x,Director::getInstance()->getVisibleSize().height-40);
+		this->getParent()->getChildByTag(4)->setPosition(x+100,Director::getInstance()->getVisibleSize().height-20);
+		this->getParent()->getChildByTag(5)->setPosition(x+100,Director::getInstance()->getVisibleSize().height-40);
 	}
 	if(curState==ATTACK)
 	{
@@ -98,13 +102,13 @@ void Hero::updateSelf(float)
 				{
 					if(distance.x<this->getAttackRange().x&&distance.x>-10&&abs(distance.y)<this->getAttackRange().y)
 						//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
-						myEnemy->changeState(HURT,0.3f,0.0f,attackDamage);
+						myEnemy->changeState(HURT,0.55f,0.0f,attackDamage);
 				}
 				else
 				{
 					if(distance.x>-this->getAttackRange().x&&distance.x<10&&abs(distance.y)<this->getAttackRange().y)
 						//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
-						myEnemy->changeState(HURT,0.3f,0.0f,attackDamage);
+						myEnemy->changeState(HURT,0.55f,0.0f,attackDamage);
 				}
 			}
 		}

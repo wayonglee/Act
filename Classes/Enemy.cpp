@@ -22,7 +22,7 @@ bool Enemy::init()
 	this->initWithSpriteFrameName("bear_idle_00.png");//ÔØÈë³õÊ¼Í¼Æ¬
 	this->setAnchorPoint(Vec2(0.5,0.5));
 
-	setSightRange(Vec2(200,100));
+	setSightRange(Vec2(300,100));
 	setAttackRange(Vec2(50,15));
 	attackCD=0;
 
@@ -60,7 +60,7 @@ void Enemy::updateSelf(float)
 		changeState(DEAD);
 		this->scheduleOnce(schedule_selector(Enemy::deleteSelf),1);
 	}
-	attackCD--;
+	if(attackCD>0)attackCD--;
 	Vec2 distance = myHero->getPosition()-this->getPosition();
 	float x = abs(distance.x);
 	float y = abs(distance.y);
@@ -86,18 +86,18 @@ void Enemy::updateSelf(float)
 			{
 				if(distance.x<attackRange.x&&distance.x>0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
 				{
-					myHero->changeState(HURT,0.05f,0.0f,attackDamage);
+					myHero->changeState(HURT,0.1f,0.0f,attackDamage);
 				}
 			}
 			else
 			{
 				if(distance.x>-attackRange.x&&distance.x<0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
 				{
-					myHero->changeState(HURT,0.05f,0.0f,attackDamage);
+					myHero->changeState(HURT,0.1f,0.0f,attackDamage);
 				}
 			}
 		}
-		attackCD=20;
+		attackCD=40;
 	}
 	this->setLocalZOrder(400+myHero->getPosition().y-this->getPosition().y);
 }
@@ -126,8 +126,8 @@ void Enemy::getChaseDirection()
 
 void Enemy::deleteSelf(float)
 {
-
 	auto gamelayer = (GameLayer*)this->getParent()->getParent()->getChildByTag(0);
+	gamelayer->killed();
 	gamelayer->removeChild(this);
 	myEnemies->removeObject(this);
 	this->release();

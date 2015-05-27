@@ -162,9 +162,8 @@ void Role::lostLife(float damage)
 	damageString = oss.str();
 	LabelTTF* damageShow = LabelTTF::create(damageString, "Arial", 18);
 	damageShow->setColor(Color3B::RED);
-	damageShow->setPosition(this->getPosition().x,this->getPosition().y+70);
+	damageShow->setPosition(this->getPosition().x,this->getPosition().y+60);
 	this->getParent()->addChild(damageShow,1000);
 	damageShow->runAction(MoveBy::create(0.5f,Vec2(0,30)));
 	damageShow->scheduleOnce(schedule_selector(DamageShow::removeSelf),0.7f);
 }
-

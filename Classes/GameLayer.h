@@ -11,16 +11,20 @@ class GameLayer:public cocos2d::Layer
 private:
 	Hero* hero;
 	CCArray* enemies;
-	int enemyNumber;
 	LabelTTF* enemyKilled;
-	int enemyKilledNumber;
+	LabelTTF* enemyAlive;
 public:
+	int enemyKilledNumber;
 	GameLayer(void);
 	~GameLayer(void);
 	CREATE_FUNC(GameLayer);
 	virtual bool init();
 	CCArray* getEnemies();
 	void addEnemy(float);
+	void addKilledCount();
+	void addEnemyCount();
+	void killed();
+	void updateSelf(float);
 };
 
 #endif
