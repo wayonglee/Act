@@ -49,7 +49,7 @@ CCArray* GameLayer::getEnemies()
 
 void GameLayer::addEnemy(float)
 {
-	if(enemies->count()<10)
+	if(enemies->count()<5)
 	{
 		srand(time(NULL));
 		float x = random<float>(-240,240);

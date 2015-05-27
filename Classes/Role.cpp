@@ -8,6 +8,7 @@ Role::Role(void):
 	stayAction(NULL),
 	walkAction(NULL),
 	attackAction(NULL),
+	skill1Action(NULL),
 	hurtAction(NULL),
 	deadAction(NULL),
 	curState(STAY),
@@ -29,6 +30,7 @@ Role::~Role(void)
 	CC_SAFE_RELEASE_NULL(stayAction);
 	CC_SAFE_RELEASE_NULL(walkAction);
 	CC_SAFE_RELEASE_NULL(attackAction);
+	CC_SAFE_RELEASE_NULL(skill1Action);
 	CC_SAFE_RELEASE_NULL(hurtAction);
 	CC_SAFE_RELEASE_NULL(deadAction);
 }
@@ -46,6 +48,11 @@ void Role::runWalkAction()
 void Role::runAttackAction()
 {
 	this->runAction(attackAction);
+}
+
+void Role::runSkill1Action()
+{
+	this->runAction(skill1Action);
 }
 
 void Role::runHurtAction()
@@ -92,7 +99,7 @@ void Role::move(Vec2 dir , bool isFlipped)
 	}
 }
 
-bool Role::changeState(RoleState state,float delay,float roll,float damage)
+bool Role::changeState(RoleState state,float delay,float roll)
 {
 	if(curState!=DEAD)
 	{
@@ -105,7 +112,8 @@ bool Role::changeState(RoleState state,float delay,float roll,float damage)
 				case STAY: stateChangeable = true; stateBreakable = true; this->runStayAction(); break;
 				case WALK: stateChangeable = true; stateBreakable = true; this->runWalkAction(); direction = Vec2(0,0); break;
 				case PREATTACK: stateChangeable = false; stateBreakable = true; this->attack(roll,delay); break;
-				case HURT: stateChangeable = false; stateBreakable = false; this->hurt(delay); lostLife(damage);break;
+				case PRESKILL1: stateChangeable = false; stateBreakable = false; this->skill1(roll,delay);break;
+				case HURT: stateChangeable = false; stateBreakable = false; this->hurt(delay);break;
 				case DEAD: stateChangeable = false; stateBreakable = false; this->runDeadAction(); break;
 			}
 			curState = state;
@@ -132,6 +140,27 @@ void Role::attackBegin(float)
 }
 
 void Role::attackFinish(float)
+{
+	stateChangeable = true;
+	changeState(STAY);
+}
+
+void Role::skill1(float roll,float delay)
+{
+	runSkill1Action();
+	this->scheduleOnce(schedule_selector(Role::skill1Begin),roll);
+	this->scheduleOnce(schedule_selector(Role::skill1Finish),delay);
+}
+
+void Role::skill1Begin(float)
+{
+	if(curState==PRESKILL1)
+	{
+		this->setCurState(SKILL1);
+	}
+}
+
+void Role::skill1Finish(float)
 {
 	stateChangeable = true;
 	changeState(STAY);

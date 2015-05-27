@@ -22,6 +22,9 @@ public:
 	CC_SYNTHESIZE(EnemyState,enemyCurState,EnemyCurState);
 	CC_SYNTHESIZE(Vec2,sightRange,SightRange);
 	CC_SYNTHESIZE(Vec2,attackRange,AttackRange);
+	CC_SYNTHESIZE(float,attackDelay,AttackDelay);//¹¥»÷Ó²Ö±
+	CC_SYNTHESIZE(float,attackRoll,AttackRoll);//¹¥»÷Ç°Ò¡
+	CC_SYNTHESIZE(float,attackHurtDelay,AttackHurtDelay);//ÉËº¦Ó²Ö±
 	Enemy(void);
 	~Enemy(void);
 	CREATE_FUNC(Enemy);

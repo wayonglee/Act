@@ -17,6 +17,7 @@ public:
 	virtual bool init();
 	void addAttckMenu();
 	void attackButton(Ref* pSender);
+	void skillButton1(Ref* pSender);
 	void connect();
 };
 

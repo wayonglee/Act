@@ -24,7 +24,11 @@ bool Enemy::init()
 
 	setSightRange(Vec2(300,100));
 	setAttackRange(Vec2(50,15));
+
 	attackCD=0;
+	attackDelay=0.8f;
+	attackRoll=0.4f;
+	attackHurtDelay=0.1f;
 
 	setAttackDamage(1.0f);
 
@@ -66,7 +70,7 @@ void Enemy::updateSelf(float)
 	float y = abs(distance.y);
 	if (x<attackRange.x&&y<attackRange.y&&attackCD<=0)
 	{
-		changeState(PREATTACK,0.8f,0.5f);
+		changeState(PREATTACK,attackDelay,attackRoll);
 	}
 	else if(x<sightRange.x&&y<sightRange.y&&x>1)
 	{
@@ -86,14 +90,16 @@ void Enemy::updateSelf(float)
 			{
 				if(distance.x<attackRange.x&&distance.x>0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
 				{
-					myHero->changeState(HURT,0.1f,0.0f,attackDamage);
+					myHero->changeState(HURT,attackHurtDelay);
+					myHero->lostLife(attackDamage);
 				}
 			}
 			else
 			{
 				if(distance.x>-attackRange.x&&distance.x<0&&y<attackRange.y)//ÅÐ¶ÏÓ¢ÐÛÊÇ·ñÔÚ·¶Î§ÄÚ
 				{
-					myHero->changeState(HURT,0.1f,0.0f,attackDamage);
+					myHero->changeState(HURT,attackHurtDelay);
+					myHero->lostLife(attackDamage);
 				}
 			}
 		}
