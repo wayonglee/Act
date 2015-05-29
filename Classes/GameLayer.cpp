@@ -1,7 +1,8 @@
 #include "GameLayer.h"
 #include"MapLayer.h"
 #include<sstream>
-
+#include "SimpleAudioEngine.h"
+using namespace CocosDenshion;
 using namespace std;
 
 GameLayer::GameLayer(void)

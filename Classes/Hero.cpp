@@ -1,6 +1,8 @@
 #include "Hero.h"
 #include "Enemy.h"
 #include "GameLayer.h"
+#include "SimpleAudioEngine.h"
+using namespace CocosDenshion;
 
 Hero::Hero(void)
 {
@@ -24,6 +26,8 @@ bool Hero::init()
 	dataInit();
 
 	this->runStayAction();
+
+	SimpleAudioEngine::getInstance()->preloadEffect("res/NormalAttack.wav");//ÔØÈëÒôÐ§
 	
 	this->schedule(schedule_selector(Hero::updateSelf));
 	return true;
@@ -183,6 +187,7 @@ void Hero::attackJudge()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,attackHurtDelay);
 						myEnemy->lostLife(attackDamage);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 				else
@@ -191,6 +196,7 @@ void Hero::attackJudge()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,attackHurtDelay);
 						myEnemy->lostLife(attackDamage);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 			}
@@ -214,6 +220,7 @@ void Hero::skillJudge1()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,skillHurtDelay1);
 						myEnemy->lostLife(attackDamage*skillRatio1);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 				else
@@ -222,6 +229,7 @@ void Hero::skillJudge1()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,skillHurtDelay1);
 						myEnemy->lostLife(attackDamage*skillRatio1);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 			}
@@ -245,6 +253,7 @@ void Hero::skillJudge2()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,skillHurtDelay2);
 						myEnemy->lostLife(attackDamage*skillRatio2);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 				else
@@ -253,6 +262,7 @@ void Hero::skillJudge2()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,skillHurtDelay2);
 						myEnemy->lostLife(attackDamage*skillRatio2);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 			}
@@ -276,6 +286,7 @@ void Hero::skillJudge3()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,skillHurtDelay3);
 						myEnemy->lostLife(attackDamage*skillRatio3);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 				else
@@ -284,6 +295,7 @@ void Hero::skillJudge3()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,skillHurtDelay3);
 						myEnemy->lostLife(attackDamage*skillRatio3);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 			}
@@ -307,6 +319,7 @@ void Hero::runningAttackJudge()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,runningAttackHurtDelay);
 						myEnemy->lostLife(attackDamage);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 				else
@@ -315,6 +328,7 @@ void Hero::runningAttackJudge()
 					{	//ÅÐ¶ÏµÐÈËÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
 						myEnemy->changeState(HURT,runningAttackHurtDelay);
 						myEnemy->lostLife(attackDamage);
+						SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 					}
 				}
 			}

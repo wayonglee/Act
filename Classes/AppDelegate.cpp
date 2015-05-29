@@ -1,5 +1,6 @@
 #include "AppDelegate.h"
 #include "GameScene.h"
+#include "WelcomeScene.h"
 
 USING_NS_CC;
 
@@ -39,8 +40,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
 
-	glview->setFrameSize(480,320);
-	glview->setFrameSize(1920,1080);
+	glview->setFrameSize(480*2,320*2);
+	//glview->setFrameSize(1920,1080);
 	glview->setDesignResolutionSize(480,320,ResolutionPolicy::FIXED_WIDTH);
     // turn on display FPS
     director->setDisplayStats(false);
@@ -51,12 +52,13 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = GameScene::create();
+    //auto scene = GameScene::create();
+	auto scene = WelcomeScene::create();
 
     // run
     director->runWithScene(scene);
 
-	scene->connect();
+	//scene->connect();
 
     return true;
 }

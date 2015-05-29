@@ -45,8 +45,8 @@ void OperateLayer::addAttckMenu()
 	skillItem2->setPosition(visibleSize.width - attackItem->getContentSize().width/2-150, attackItem->getContentSize().height/2+20);
 	//技能2按钮
 
-	auto skillItem3 = MenuItemImage::create("res/attackbuttonNormal.png","res/attackbuttonSelected.png",CC_CALLBACK_1(OperateLayer::skillButton3,this));
-	skillItem3->setScale(1.2);
+	auto skillItem3 = MenuItemImage::create("res/SkillNormal.png","res/SkillClick.png",CC_CALLBACK_1(OperateLayer::skillButton3,this));
+	skillItem3->setScale(0.6);
 	skillItem3->setPosition(visibleSize.width - attackItem->getContentSize().width/2-200, attackItem->getContentSize().height/2+20);
 	//技能2按钮
 

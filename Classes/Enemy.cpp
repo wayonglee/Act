@@ -1,6 +1,8 @@
 #include "Enemy.h"
 #include "Hero.h"
 #include "GameLayer.h"
+#include "SimpleAudioEngine.h"
+using namespace CocosDenshion;
 
 
 Enemy::Enemy(void)
@@ -61,7 +63,11 @@ void Enemy::updateSelf(float)
 	if(curtLifeValue<=0)
 	{
 		changeState(DEAD);
-		this->scheduleOnce(schedule_selector(Enemy::deleteSelf),1);
+		if(curState==DEAD)
+		{
+			this->runAction(Sequence::create(DelayTime::create(1.5f),FadeOut::create(1.0f),NULL));
+			this->scheduleOnce(schedule_selector(Enemy::deleteSelf),2.5f);
+		}
 	}
 	if(attackCD>0)attackCD--;
 	Vec2 distance = myHero->getPosition()-this->getPosition();
@@ -91,6 +97,7 @@ void Enemy::updateSelf(float)
 				{
 					myHero->changeState(HURT,attackHurtDelay);
 					myHero->lostLife(attackDamage);
+					SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 				}
 			}
 			else
@@ -99,6 +106,7 @@ void Enemy::updateSelf(float)
 				{
 					myHero->changeState(HURT,attackHurtDelay);
 					myHero->lostLife(attackDamage);
+					SimpleAudioEngine::getInstance()->playEffect("res/NormalAttack.wav");
 				}
 			}
 		}
