@@ -82,17 +82,16 @@ void JoyStick::onTouchesMoved(const std::vector<Touch*>& touches,Event* pEvent)
 }
 void JoyStick::onTouchesEnded(const std::vector<Touch*>& touches,Event* pEvent)
 {
-	//if(touches.size()==1)
+	if(isW)
 	{
-		if(isW)
-			if(joyStick->getPosition()!=stickPosition)
-			{
-				hideJoyStick();
-				joyStick->setPosition(stickPosition);
-				this->unschedule(schedule_selector(JoyStick::updateMove));//停止移动
-				myHero->changeState(STAY);//改变角色状态
-				isW = false;
-			}
+		if(joyStick->getPosition()!=stickPosition)
+		{
+			hideJoyStick();
+			joyStick->setPosition(stickPosition);
+			this->unschedule(schedule_selector(JoyStick::updateMove));//停止移动
+			myHero->changeState(STAY);//改变角色状态
+			isW = false;
+		}
 	}
 }
 

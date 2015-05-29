@@ -3,7 +3,6 @@
 #include "GameLayer.h"
 
 
-
 Enemy::Enemy(void)
 {
 }

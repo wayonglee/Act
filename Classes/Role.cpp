@@ -8,7 +8,10 @@ Role::Role(void):
 	stayAction(NULL),
 	walkAction(NULL),
 	attackAction(NULL),
-	skill1Action(NULL),
+	skillAction1(NULL),
+	skillAction2(NULL),
+	skillAction3(NULL),
+	runningAttackAction(NULL),
 	hurtAction(NULL),
 	deadAction(NULL),
 	curState(STAY),
@@ -24,13 +27,15 @@ Role::Role(void):
 	
 }
 
-
 Role::~Role(void)
 {
 	CC_SAFE_RELEASE_NULL(stayAction);
 	CC_SAFE_RELEASE_NULL(walkAction);
 	CC_SAFE_RELEASE_NULL(attackAction);
-	CC_SAFE_RELEASE_NULL(skill1Action);
+	CC_SAFE_RELEASE_NULL(skillAction1);
+	CC_SAFE_RELEASE_NULL(skillAction2);
+	CC_SAFE_RELEASE_NULL(skillAction3);
+	CC_SAFE_RELEASE_NULL(runningAttackAction);
 	CC_SAFE_RELEASE_NULL(hurtAction);
 	CC_SAFE_RELEASE_NULL(deadAction);
 }
@@ -50,9 +55,19 @@ void Role::runAttackAction()
 	this->runAction(attackAction);
 }
 
-void Role::runSkill1Action()
+void Role::runSkillAction(int skill)
 {
-	this->runAction(skill1Action);
+	switch(skill)
+	{
+	case 1:this->runAction(skillAction1);break;
+	case 2:this->runAction(skillAction2);break;
+	case 3:this->runAction(skillAction3);break;
+	}
+}
+
+void Role::runRunningAttackAction()
+{
+	this->runAction(runningAttackAction);
 }
 
 void Role::runHurtAction()
@@ -65,7 +80,7 @@ void Role::runDeadAction()
 	this->runAction(deadAction);
 }
 
-Animation* Role::createAnimation(const char* formatStr,int frameSize,int fps)
+Animation* Role::createAnimation(const char* formatStr,int frameSize,int fps)//´´½¨¶¯»­
 {
 	Vector<SpriteFrame*> pFrames;
 	for(int i=0;i<frameSize;i++)
@@ -91,7 +106,7 @@ Animation* Role::createAttackAnimation(const char* formatStr,int beginFrame,int 
 
 void Role::move(Vec2 dir , bool isFlipped)
 {
-	if(curState==WALK)
+	if(curState==WALK||curState==PRERUNNINGATTACK)
 	{
 		this->setFlippedX(isFlipped);
 		Vec2 destdir = Vec2(dir.x*speed,dir.y*speed);
@@ -99,7 +114,7 @@ void Role::move(Vec2 dir , bool isFlipped)
 	}
 }
 
-bool Role::changeState(RoleState state,float delay,float roll)
+bool Role::changeState(RoleState state,float delay,float roll,int skill)
 {
 	if(curState!=DEAD)
 	{
@@ -109,12 +124,13 @@ bool Role::changeState(RoleState state,float delay,float roll)
 			//this->unscheduleAllSelectors();
 			switch(state)
 			{
-				case STAY: stateChangeable = true; stateBreakable = true; this->runStayAction(); break;
-				case WALK: stateChangeable = true; stateBreakable = true; this->runWalkAction(); direction = Vec2(0,0); break;
-				case PREATTACK: stateChangeable = false; stateBreakable = true; this->attack(roll,delay); break;
-				case PRESKILL1: stateChangeable = false; stateBreakable = false; this->skill1(roll,delay);break;
-				case HURT: stateChangeable = false; stateBreakable = false; this->hurt(delay);break;
-				case DEAD: stateChangeable = false; stateBreakable = false; this->runDeadAction(); break;
+			case STAY: stateChangeable = true; stateBreakable = true; this->runStayAction(); break;
+			case WALK: stateChangeable = true; stateBreakable = true; this->runWalkAction(); direction = Vec2(0,0); break;
+			case PREATTACK: stateChangeable = false; stateBreakable = true; this->attack(delay,roll); break;
+			case PRESKILL: stateChangeable = false; stateBreakable = false; this->skill(delay,roll,skill);break;
+			case PRERUNNINGATTACK:stateChangeable = false; stateBreakable = true; this->runningAttack(delay,roll);break;
+			case HURT: stateChangeable = false; stateBreakable = false; this->hurt(delay);break;
+			case DEAD: stateChangeable = false; stateBreakable = false; this->runDeadAction(); break;
 			}
 			curState = state;
 			return true;
@@ -123,7 +139,7 @@ bool Role::changeState(RoleState state,float delay,float roll)
 	return false;
 }
 
-void Role::attack(float roll,float delay)
+void Role::attack(float delay,float roll)
 {
 	runAttackAction();
 	this->scheduleOnce(schedule_selector(Role::attackBegin),roll);
@@ -145,22 +161,66 @@ void Role::attackFinish(float)
 	changeState(STAY);
 }
 
-void Role::skill1(float roll,float delay)
+void Role::skill(float delay,float roll,int skill)
 {
-	runSkill1Action();
-	this->scheduleOnce(schedule_selector(Role::skill1Begin),roll);
-	this->scheduleOnce(schedule_selector(Role::skill1Finish),delay);
+	runSkillAction(skill);
+	switch(skill)
+	{
+	case 1:this->scheduleOnce(schedule_selector(Role::skillBegin1),roll);break;
+	case 2:this->scheduleOnce(schedule_selector(Role::skillBegin2),roll);break;
+	case 3:this->scheduleOnce(schedule_selector(Role::skillBegin3),roll);break;
+	}
+	this->scheduleOnce(schedule_selector(Role::skillFinish),delay);
 }
 
-void Role::skill1Begin(float)
+void Role::skillBegin1(float)
 {
-	if(curState==PRESKILL1)
+	if(curState==PRESKILL)
 	{
 		this->setCurState(SKILL1);
 	}
 }
 
-void Role::skill1Finish(float)
+void Role::skillBegin2(float)
+{
+	if(curState==PRESKILL)
+	{
+		this->setCurState(SKILL2);
+	}
+}
+
+void Role::skillBegin3(float)
+{
+	if(curState==PRESKILL)
+	{
+		this->setCurState(SKILL3);
+	}
+}
+
+void Role::skillFinish(float)
+{
+	stateChangeable = true;
+	stateBreakable = true;
+	changeState(STAY);
+}
+
+void Role::runningAttack(float delay,float roll)
+{
+	runRunningAttackAction();
+	this->scheduleOnce(schedule_selector(Role::runningAttackBegin),roll);
+	this->scheduleOnce(schedule_selector(Role::runningAttackFinish),delay);
+}
+
+void Role::runningAttackBegin(float)
+{
+	if(curState==PRERUNNINGATTACK)
+	{
+		stateBreakable = false;
+		this->setCurState(RUNNINGATTACK);
+	}
+}
+
+void Role::runningAttackFinish(float)
 {
 	stateChangeable = true;
 	changeState(STAY);

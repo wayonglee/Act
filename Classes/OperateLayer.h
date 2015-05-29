@@ -18,6 +18,8 @@ public:
 	void addAttckMenu();
 	void attackButton(Ref* pSender);
 	void skillButton1(Ref* pSender);
+	void skillButton2(Ref* pSender);
+	void skillButton3(Ref* pSender);
 	void connect();
 };
 
