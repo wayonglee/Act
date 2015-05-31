@@ -1,5 +1,6 @@
 #include"WelcomeLayer.h"
-#include "SimpleAudioEngine.h"
+#include"SimpleAudioEngine.h"
+#include"ChooseMapLayer.h"
 using namespace CocosDenshion;
 
 
@@ -79,7 +80,8 @@ void WelcomeLayer::addMenuSprite()
 	if (music_on)
 	{
 		musicTTF = LabelTTF::create("Music On", "arial.ttf", 18);
-		this->scheduleOnce(schedule_selector(WelcomeLayer::playBackgroundMusic),1.0f);
+		SimpleAudioEngine::getInstance()->playBackgroundMusic("res/MenuMusic.mp3");
+		//this->scheduleOnce(schedule_selector(WelcomeLayer::playBackgroundMusic),1.0f);
 	}
 	else
 	{
@@ -119,12 +121,10 @@ void WelcomeLayer::menuTouchDown(Ref* pSender, Control::EventType event)
 	{
 		log("single game");
 		SimpleAudioEngine::getInstance()->stopBackgroundMusic("res/MenuMusic.mp3");
-		auto scene = GameScene::create();
+		/*auto scene = GameScene::create();
 		Director::getInstance()->pushScene(scene);
-		scene->connect();
-		//Director::getInstance()->pushScene(ChooseMapScene::create());
-		//ChooseMapLayer* chooseMapLayer = ChooseMapLayer::create();
-		//this->getScene()->addChild(chooseMapLayer, 10);
+		scene->connect();*/
+		this->addChild(ChooseMapLayer::create());
 	}
 
 	case 2:

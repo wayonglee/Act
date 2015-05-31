@@ -170,7 +170,6 @@ void Hero::heroMove()
 	this->getParent()->getChildByTag(5)->setPosition(x+100,Director::getInstance()->getVisibleSize().height-40);
 }
 
-
 void Hero::attackJudge()
 {
 	if(attackCD<=0)
